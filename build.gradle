@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.0.6'
+    ext.kotlin_version = '1.1.0'
     repositories {
         mavenCentral()
     }
@@ -13,8 +13,8 @@ plugins {
     id 'java'
     id 'maven'
     id 'signing'
-    id 'net.researchgate.release' version '2.4.1'
-    id 'com.github.ben-manes.versions' version '0.13.0'
+    id 'net.researchgate.release' version '2.5.0'
+    id 'com.github.ben-manes.versions' version '0.14.0'
 }
 apply plugin: 'kotlin'
 
@@ -47,16 +47,24 @@ compileTestJava {
     options.deprecation = true
 }
 
+compileKotlin {
+    kotlinOptions {
+        apiVersion = 1.1
+        languageVersion = 1.1
+    }
+
+}
+
 dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compileOnly "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    compile group:"org.jdbi", name:"jdbi", version:"$jdbiVersion"
+    compile group: "org.jdbi", name: "jdbi", version: "$jdbiVersion"
+
     testCompile "junit:junit:${junitVersion}"
-    
     testCompile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
-    testCompile group:"com.h2database", name:"h2", version:"$h2dbVersion"
+    testCompile group: "com.h2database", name: "h2", version: "$h2dbVersion"
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -80,10 +88,15 @@ task resolveDependencies {
     doLast {
         project.rootProject.allprojects.each { subProject ->
             subProject.buildscript.configurations.each { configuration ->
-                configuration.resolve()
+                if (configuration.isCanBeResolved()) {
+                    configuration.resolve()
+                }
+
             }
             subProject.configurations.each { configuration ->
-                configuration.resolve()
+                if (configuration.isCanBeResolved()) {
+                    configuration.resolve()
+                }
             }
         }
     }
