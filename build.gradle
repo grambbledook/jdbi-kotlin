@@ -1,0 +1,151 @@
+buildscript {
+    ext.kotlin_version = '1.0.6'
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+plugins {
+    id 'java'
+    id 'maven'
+    id 'signing'
+    id 'net.researchgate.release' version '2.4.1'
+    id 'com.github.ben-manes.versions' version '0.13.0'
+}
+apply plugin: 'kotlin'
+
+ext {
+    junitVersion = '4.12'
+    jdbiVersion = '2.78'
+    h2dbVersion = '1.4.193'
+}
+
+group = 'co.wrisk.jdbi'
+
+repositories {
+    mavenCentral()
+
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+}
+
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    options.deprecation = true
+}
+
+compileTestJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    options.deprecation = true
+}
+
+dependencies {
+    compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    compileOnly "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    compile group:"org.jdbi", name:"jdbi", version:"$jdbiVersion"
+    testCompile "junit:junit:${junitVersion}"
+    
+    testCompile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
+    testCompile group:"com.h2database", name:"h2", version:"$h2dbVersion"
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+signing {
+    required { !version.contains("SNAPSHOT") }
+    sign configurations.archives
+}
+
+task resolveDependencies {
+    doLast {
+        project.rootProject.allprojects.each { subProject ->
+            subProject.buildscript.configurations.each { configuration ->
+                configuration.resolve()
+            }
+            subProject.configurations.each { configuration ->
+                configuration.resolve()
+            }
+        }
+    }
+}
+
+release {
+    git {
+        requireBranch = 'gradle-build'
+    }
+}
+afterReleaseBuild.dependsOn uploadArchives
+
+uploadArchives {
+
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name 'Jdbi mapper for Kotlin data classes'
+                packaging 'jar'
+                // optionally artifactId can be defined here
+                description 'Jdbi mapper for Kotlin data classes.'
+                url 'https://github.com/WriskHQ/jdbi-kotlin'
+
+                scm {
+                    connection 'scm:git:git@github.com:WriskHQ/jdbi-kotlin.git'
+                    developerConnection 'scm:git:git@github.com:WriskHQ/jdbi-kotlin.git'
+                    url 'https://github.com/WriskHQ/jdbi-kotlin'
+                }
+
+                licenses {
+                    license {
+                        name 'The MIT License (MIT)'
+                        url 'https://raw.githubusercontent.com/WriskHQ/jdbi-kotlin/master/LICENSE'
+                    }
+                }
+
+                developers {
+                    developer {
+                        name 'Alex Harin'
+                        email 'alex@wrisk.co'
+                    }
+                }
+            }
+        }
+    }
+}
+
+sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+}
+
+
+
+
+
