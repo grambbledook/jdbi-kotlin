@@ -13,7 +13,7 @@ import java.sql.Connection
 import java.util.*
 import kotlin.test.assertEquals
 
-class KotlinMapperTest {
+class KotlinPluginTest {
     data class Thing(val id: Int, val name: String,
                      val nullable: String?,
                      val nullableDefaultedNull: String? = null,
