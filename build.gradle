@@ -89,11 +89,6 @@ task resolveDependencies {
     }
 }
 
-release {
-    git {
-        requireBranch = 'gradle-build'
-    }
-}
 afterReleaseBuild.dependsOn uploadArchives
 
 uploadArchives {
