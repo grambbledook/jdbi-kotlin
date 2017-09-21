@@ -38,7 +38,7 @@ class KotlinMapper<C : Any>(clazz: Class<C>) : ResultSetMapper<C> {
     private val constructor = findConstructor(kClass)
     private val constructorParameters = constructor.parameters
     private val nullableMandatoryParameters = constructorParameters.filter { !it.isOptional && it.type.isMarkedNullable }
-    private val mutableProperties = kClass.memberProperties.map { it as? KMutableProperty1 }.filterNotNull()
+    private val mutableProperties = kClass.memberProperties.mapNotNull { it as? KMutableProperty1 }
 
     private val propertyByColumnCache = ConcurrentHashMap<String, Optional<KMutableProperty1<C, *>>>()
     private val parameterByColumnCache = ConcurrentHashMap<String, Optional<KParameter>>()

@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.1.0'
+    ext.kotlin_version = '1.1.4-3'
     repositories {
         mavenCentral()
     }
@@ -13,15 +13,15 @@ plugins {
     id 'java'
     id 'maven'
     id 'signing'
-    id 'net.researchgate.release' version '2.5.0'
-    id 'com.github.ben-manes.versions' version '0.14.0'
+    id 'net.researchgate.release' version '2.6.0'
+    id 'com.github.ben-manes.versions' version '0.15.0'
 }
 apply plugin: 'kotlin'
 
 ext {
     junitVersion = '4.12'
     jdbiVersion = '2.78'
-    h2dbVersion = '1.4.193'
+    h2dbVersion = '1.4.196'
 }
 
 group = 'co.wrisk.jdbi'
@@ -58,7 +58,7 @@ compileKotlin {
 dependencies {
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     compileOnly "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    compile group: "org.jdbi", name: "jdbi", version: "$jdbiVersion"
+    compileOnly "org.jdbi:jdbi:$jdbiVersion"
 
     testCompile "junit:junit:${junitVersion}"
     testCompile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
