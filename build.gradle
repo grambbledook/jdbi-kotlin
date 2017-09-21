@@ -61,6 +61,7 @@ dependencies {
     compileOnly "org.jdbi:jdbi:$jdbiVersion"
 
     testCompile "junit:junit:${junitVersion}"
+    testCompile "org.jdbi:jdbi:$jdbiVersion"
     testCompile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     testCompile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     testCompile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
